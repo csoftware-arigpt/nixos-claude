@@ -13,6 +13,7 @@ github_mcp="$package/lib/claude-desktop/resources/app.asar.unpacked/resources/gi
 search_provider="$package/share/dbus-1/services/com.anthropic.Claude.SearchProvider.service"
 
 test -x "$package/bin/claude-desktop"
+grep -Fq '/run/wrappers/bin/__chromium-suid-sandbox' "$package/bin/claude-desktop"
 test -x "$app"
 test -x "$virtiofsd"
 test -x "$chrome_native_host"
@@ -41,4 +42,4 @@ for binary in "$app" "$virtiofsd" "$chrome_native_host"; do
   patchelf --print-rpath "$binary" | grep -q /nix/store/
 done
 
-"$package/bin/claude-desktop" --version | grep -Fq "$expected_version"
+"$package/bin/claude-desktop" --no-sandbox --version | grep -Fq "$expected_version"

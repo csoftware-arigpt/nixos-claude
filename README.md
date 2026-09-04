@@ -11,8 +11,9 @@ Last package update: `2026-09-04T13:20:08Z`.
 
 Using the module is recommended because Claude Code downloads its own generic
 Linux executable at runtime. The module enables `nix-ld` for that executable
-and configures a desktop portal; the package itself supplies the patched QEMU,
-OVMF, and virtiofsd paths used by Code and Cowork.
+and configures a desktop portal plus Chromium's SUID sandbox fallback; the
+package itself supplies the patched QEMU, OVMF, and virtiofsd paths used by
+Code and Cowork.
 
 ```nix
 {
@@ -64,8 +65,9 @@ nix profile upgrade nixos-claude
   Code/Cowork microVM.
 - Enables Wayland/X11 auto-selection, desktop portals, keyring integration,
   links, and trash handling.
-- Removes the unusable setuid `chrome-sandbox`; Electron falls back to the
-  unprivileged user-namespace sandbox supported by NixOS.
+- Removes the unusable bundled setuid `chrome-sandbox`; the launcher uses
+  NixOS's managed Chromium sandbox when enabled and otherwise falls back to
+  unprivileged user namespaces.
 
 Hardware virtualization must be enabled in firmware and `/dev/kvm` must be
 available. Verify it with:

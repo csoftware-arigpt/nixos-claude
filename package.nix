@@ -196,7 +196,7 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   postFixup = ''
-    makeWrapper "$out/lib/claude-desktop/claude-desktop" "$out/bin/claude-desktop" \
+    makeWrapper "$out/lib/claude-desktop/claude-desktop" "$out/lib/claude-desktop/.claude-desktop-wrapped" \
       "''${gappsWrapperArgs[@]}" \
       --prefix PATH : "${
         lib.makeBinPath [
@@ -211,6 +211,15 @@ stdenv.mkDerivation (finalAttrs: {
       --set CLAUDE_NIX_FIRMWARE "${OVMF.fd}/FV/OVMF_CODE.fd" \
       --set CLAUDE_NIX_VIRTIOFSD "$out/lib/claude-desktop/resources/virtiofsd" \
       --set-default ELECTRON_OZONE_PLATFORM_HINT auto
+
+    cat > "$out/bin/claude-desktop" <<EOF
+    #!${stdenv.shell}
+    if [ -u /run/wrappers/bin/__chromium-suid-sandbox ]; then
+      export CHROME_DEVEL_SANDBOX=/run/wrappers/bin/__chromium-suid-sandbox
+    fi
+    exec "$out/lib/claude-desktop/.claude-desktop-wrapped" "\$@"
+    EOF
+    chmod +x "$out/bin/claude-desktop"
   '';
 
   passthru.updateScript = ./scripts/update.sh;

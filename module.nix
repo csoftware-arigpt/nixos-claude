@@ -31,6 +31,7 @@ in
     lib.mkMerge [
       {
         environment.systemPackages = [ cfg.package ];
+        security.chromiumSuidSandbox.enable = lib.mkDefault true;
         xdg.portal.enable = lib.mkDefault true;
         xdg.portal.extraPortals = lib.mkDefault [ pkgs.xdg-desktop-portal-gtk ];
       }
