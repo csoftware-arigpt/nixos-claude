@@ -26,6 +26,7 @@ test -f "$search_provider"
 find "$package/share/icons" -type f -iname '*claude*' -print -quit | grep -q .
 
 grep -Fq "Exec=$package/bin/claude-desktop" "$desktop"
+grep -Fqx "Icon=$package/share/icons/hicolor/256x256/apps/claude-desktop.png" "$desktop"
 if grep -q '^Exec=claude-desktop' "$desktop"; then
   exit 1
 fi
@@ -43,4 +44,9 @@ for binary in "$app" "$virtiofsd" "$chrome_native_host"; do
   patchelf --print-rpath "$binary" | grep -q /nix/store/
 done
 
-"$package/bin/claude-desktop" --no-sandbox --version | grep -Fq "$expected_version"
+test_home=$(mktemp -d)
+HOME="$test_home" XDG_DATA_HOME="$test_home/share" \
+  "$package/bin/claude-desktop" --no-sandbox --version | grep -Fq "$expected_version"
+test -L "$test_home/share/applications/com.anthropic.Claude.desktop"
+grep -Fqx 'x-scheme-handler/claude=com.anthropic.Claude.desktop;' \
+  "$test_home/share/applications/mimeinfo.cache"

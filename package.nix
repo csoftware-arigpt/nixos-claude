@@ -7,8 +7,10 @@
   at-spi2-core,
   autoPatchelfHook,
   cairo,
+  coreutils,
   cups,
   dbus,
+  desktop-file-utils,
   dpkg,
   expat,
   fetchurl,
@@ -156,7 +158,8 @@ stdenv.mkDerivation (finalAttrs: {
     rm -f "$out/lib/claude-desktop/chrome-sandbox"
 
     substituteInPlace "$out/share/applications/com.anthropic.Claude.desktop" \
-      --replace-fail "Exec=claude-desktop" "Exec=$out/bin/claude-desktop"
+      --replace-fail "Exec=claude-desktop" "Exec=$out/bin/claude-desktop" \
+      --replace-fail "Icon=claude-desktop" "Icon=$out/share/icons/hicolor/256x256/apps/claude-desktop.png"
 
     mkdir -p \
       "$out/share/dbus-1/services" \
@@ -172,7 +175,10 @@ stdenv.mkDerivation (finalAttrs: {
     substituteInPlace "$out/lib/claude-desktop/resources/gnome-search-provider/searchProvider.js" \
       --replace-fail \
         'const EXECUTABLE = "claude-desktop";' \
-        'const EXECUTABLE = "'$out'/bin/claude-desktop";'
+        'const EXECUTABLE = "'$out'/bin/claude-desktop";' \
+      --replace-fail \
+        'const ICON_NAME = "claude-desktop";' \
+        'const ICON_NAME = "'$out'/share/icons/hicolor/256x256/apps/claude-desktop.png";'
 
     appAsar="$out/lib/claude-desktop/resources/app.asar"
     asarRoot="$(mktemp -d)"
@@ -221,10 +227,34 @@ stdenv.mkDerivation (finalAttrs: {
 
     cat > "$out/bin/claude-desktop" <<EOF
     #!${stdenv.shell}
+    package_share="$out/share"
+    desktop_source="$out/share/applications/com.anthropic.Claude.desktop"
+    wrapped="$out/lib/claude-desktop/.claude-desktop-wrapped"
+    mkdir_bin="${coreutils}/bin/mkdir"
+    ln_bin="${coreutils}/bin/ln"
+    update_desktop_database="${desktop-file-utils}/bin/update-desktop-database"
+    xdg_mime="${xdg-utils}/bin/xdg-mime"
+    EOF
+    cat >> "$out/bin/claude-desktop" <<'EOF'
+    data_home="''${XDG_DATA_HOME:-''${HOME:+$HOME/.local/share}}"
+    if [ -n "$data_home" ]; then
+      applications="$data_home/applications"
+      desktop_target="$applications/com.anthropic.Claude.desktop"
+      "$mkdir_bin" -p "$applications" 2>/dev/null
+      if [ -L "$desktop_target" ]; then
+        "$ln_bin" -sfn "$desktop_source" "$desktop_target"
+      elif [ ! -e "$desktop_target" ]; then
+        "$ln_bin" -s "$desktop_source" "$desktop_target"
+      fi
+      "$update_desktop_database" "$applications" >/dev/null 2>&1 || true
+      XDG_DATA_DIRS="$package_share''${XDG_DATA_DIRS:+:$XDG_DATA_DIRS}" \
+        "$xdg_mime" default com.anthropic.Claude.desktop x-scheme-handler/claude \
+        >/dev/null 2>&1 || true
+    fi
     if [ -u /run/wrappers/bin/__chromium-suid-sandbox ]; then
       export CHROME_DEVEL_SANDBOX=/run/wrappers/bin/__chromium-suid-sandbox
     fi
-    exec "$out/lib/claude-desktop/.claude-desktop-wrapped" "\$@"
+    exec "$wrapped" "$@"
     EOF
     chmod +x "$out/bin/claude-desktop"
   '';

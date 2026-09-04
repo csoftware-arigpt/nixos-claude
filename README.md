@@ -67,6 +67,8 @@ nix profile upgrade nixos-claude
   links, and trash handling.
 - Removes Nix-specific library variables before handing external links to the
   system browser, so OAuth works across independently updated configurations.
+- Registers the `claude://` handler in the user's desktop MIME database so the
+  browser can return OAuth callbacks to the running application.
 - Removes the unusable bundled setuid `chrome-sandbox`; the launcher uses
   NixOS's managed Chromium sandbox when enabled and otherwise falls back to
   unprivileged user namespaces.
