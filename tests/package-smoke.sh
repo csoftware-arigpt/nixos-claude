@@ -14,6 +14,7 @@ search_provider="$package/share/dbus-1/services/com.anthropic.Claude.SearchProvi
 
 test -x "$package/bin/claude-desktop"
 grep -Fq '/run/wrappers/bin/__chromium-suid-sandbox' "$package/bin/claude-desktop"
+grep -aFq -- '-xdg-open/bin' "$package/lib/claude-desktop/.claude-desktop-wrapped"
 test -x "$app"
 test -x "$virtiofsd"
 test -x "$chrome_native_host"

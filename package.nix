@@ -55,11 +55,17 @@
   vulkan-loader,
   wayland,
   wrapGAppsHook3,
+  writeShellScriptBin,
   xdg-utils,
 }:
 
 let
   source = import ./sources.nix;
+
+  cleanXdgOpen = writeShellScriptBin "xdg-open" ''
+    unset LD_LIBRARY_PATH GIO_EXTRA_MODULES GDK_PIXBUF_MODULE_FILE
+    exec ${xdg-utils}/bin/xdg-open "$@"
+  '';
 
   runtimeLibraries = [
     alsa-lib
@@ -200,6 +206,7 @@ stdenv.mkDerivation (finalAttrs: {
       "''${gappsWrapperArgs[@]}" \
       --prefix PATH : "${
         lib.makeBinPath [
+          cleanXdgOpen
           glib
           qemu_kvm
           trash-cli

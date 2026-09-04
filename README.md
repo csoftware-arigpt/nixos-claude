@@ -65,6 +65,8 @@ nix profile upgrade nixos-claude
   Code/Cowork microVM.
 - Enables Wayland/X11 auto-selection, desktop portals, keyring integration,
   links, and trash handling.
+- Removes Nix-specific library variables before handing external links to the
+  system browser, so OAuth works across independently updated configurations.
 - Removes the unusable bundled setuid `chrome-sandbox`; the launcher uses
   NixOS's managed Chromium sandbox when enabled and otherwise falls back to
   unprivileged user namespaces.
