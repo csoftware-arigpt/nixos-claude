@@ -4,6 +4,8 @@ An unofficial Nix package for the **official Claude Desktop Linux application
 by Anthropic**. The package is fetched only from Anthropic's official
 [`downloads.claude.ai` stable repository](https://downloads.claude.ai/claude-desktop/apt/stable/).
 
+![Claude Desktop running on NixOS](assets/claude-nixos.png)
+
 Current packaged version: `1.46388.2`.
 Last package update: `2026-09-04T18:24:05Z`.
 
