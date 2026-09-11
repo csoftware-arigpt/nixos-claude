@@ -45,8 +45,15 @@ for binary in "$app" "$virtiofsd" "$chrome_native_host"; do
 done
 
 test_home=$(mktemp -d)
+mkdir -p "$test_home/share/applications"
+cat > "$test_home/share/applications/com.anthropic.Claude.desktop" <<'EOF'
+[Desktop Entry]
+Name=Stale Claude Desktop launcher
+Exec=/nix/store/removed-claude-desktop/bin/claude-desktop
+EOF
 HOME="$test_home" XDG_DATA_HOME="$test_home/share" \
   "$package/bin/claude-desktop" --no-sandbox --version | grep -Fq "$expected_version"
 test -L "$test_home/share/applications/com.anthropic.Claude.desktop"
+test "$(readlink -f "$test_home/share/applications/com.anthropic.Claude.desktop")" = "$desktop"
 grep -Fqx 'x-scheme-handler/claude=com.anthropic.Claude.desktop;' \
   "$test_home/share/applications/mimeinfo.cache"

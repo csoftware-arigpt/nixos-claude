@@ -232,6 +232,8 @@ stdenv.mkDerivation (finalAttrs: {
     wrapped="$out/lib/claude-desktop/.claude-desktop-wrapped"
     mkdir_bin="${coreutils}/bin/mkdir"
     ln_bin="${coreutils}/bin/ln"
+    readlink_bin="${coreutils}/bin/readlink"
+    rm_bin="${coreutils}/bin/rm"
     update_desktop_database="${desktop-file-utils}/bin/update-desktop-database"
     xdg_mime="${xdg-utils}/bin/xdg-mime"
     EOF
@@ -241,9 +243,13 @@ stdenv.mkDerivation (finalAttrs: {
       applications="$data_home/applications"
       desktop_target="$applications/com.anthropic.Claude.desktop"
       "$mkdir_bin" -p "$applications" 2>/dev/null
-      if [ -L "$desktop_target" ]; then
-        "$ln_bin" -sfn "$desktop_source" "$desktop_target"
-      elif [ ! -e "$desktop_target" ]; then
+      if [ -e "$desktop_target" ] || [ -L "$desktop_target" ]; then
+        desktop_current=$("$readlink_bin" -f -- "$desktop_target" 2>/dev/null || true)
+        if [ "$desktop_current" != "$desktop_source" ]; then
+          "$rm_bin" -f -- "$desktop_target"
+        fi
+      fi
+      if [ ! -e "$desktop_target" ] && [ ! -L "$desktop_target" ]; then
         "$ln_bin" -s "$desktop_source" "$desktop_target"
       fi
       "$update_desktop_database" "$applications" >/dev/null 2>&1 || true
