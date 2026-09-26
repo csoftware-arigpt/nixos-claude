@@ -21,6 +21,14 @@ jobs:
       - uses: cachix/install-nix-action@v31
       - name: Check official stable repository
         run: nix develop -c ./scripts/update.sh
+      - name: Sync repository description
+        env:
+          GH_TOKEN: ${{ secrets.REPO_METADATA_TOKEN }}
+        shell: bash
+        run: |
+          version=$(sed -n 's/  version = "\([^"]*\)";/\1/p' sources.nix)
+          gh api --method PATCH "repos/$GITHUB_REPOSITORY" \
+            --raw-field "description=Official Claude Desktop app $version packaged for NixOS (auto-updated)"
       - name: Verify and publish update
         shell: bash
         run: |
