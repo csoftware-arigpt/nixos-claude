@@ -6,8 +6,8 @@ by Anthropic**. The package is fetched only from Anthropic's official
 
 ![Claude Desktop running on NixOS](assets/claude-nixos.png)
 
-Current packaged version: `3.6556.1`.
-Last package update: `2026-10-22T22:19:51Z`.
+Current packaged version: `3.6556.2`.
+Last package update: `2026-10-23T07:30:42Z`.
 
 ## Full NixOS installation
 
