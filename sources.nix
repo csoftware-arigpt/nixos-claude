@@ -1,5 +1,5 @@
 {
-  version = "4.16336.0";
-  url = "https://downloads.claude.ai/claude-desktop/apt/stable/pool/main/c/claude-desktop/claude-desktop_4.16336.0_amd64.deb";
-  hash = "sha256-OBBzPpN5L3Dq6SEXXRPlPRzGvc6dwjEX8FiAh1IaZLw=";
+  version = "4.23118.0";
+  url = "https://downloads.claude.ai/claude-desktop/apt/stable/pool/main/c/claude-desktop/claude-desktop_4.23118.0_amd64.deb";
+  hash = "sha256-GtmW6MqrBcmzdGRgUcQMtrudhPNxdW8VuNNyiJdRWpc=";
 }
